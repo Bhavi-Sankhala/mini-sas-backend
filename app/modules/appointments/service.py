@@ -84,3 +84,21 @@ class AppointmentService:
             }, 200
         except Exception as e:
             return {"success": False, "error": str(e)}, 400
+        
+    @staticmethod
+    def get_patient_view(appointment_id):
+        appointment = AppointmentRepository.get_for_patient_view(appointment_id)
+
+        if not appointment:
+            return {
+                "success": False,
+                "data": None,
+                "error": "Appointment not found"
+            }, 404
+
+        return {
+            "success": True,
+            "data": appointment,
+            "error": None
+        }, 200
+

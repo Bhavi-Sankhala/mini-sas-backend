@@ -280,3 +280,36 @@ class AppointmentRepository:
             return {"appointments": appointments, "stats": stats}
         finally:
             session.close()
+
+
+    @staticmethod
+    def get_for_patient_view(appointment_id):
+        session = SessionLocal()
+        try:
+            query = text("""
+                SELECT
+                    a.appointment_id,
+                    a.slot_time::TEXT AS slot_time,
+                    a.status,
+                    a.provider_id,
+                    p.patient_id,
+                    p.full_name,
+                    p.phone_number,
+                    p.email
+                FROM appointments a
+                JOIN patients p ON a.patient_id = p.patient_id
+                WHERE a.appointment_id = :appointment_id
+            """)
+
+            result = session.execute(
+                query,
+                {"appointment_id": appointment_id}
+            ).mappings().fetchone()
+
+            if not result:
+                return None
+
+            return dict(result)
+
+        finally:
+            session.close()

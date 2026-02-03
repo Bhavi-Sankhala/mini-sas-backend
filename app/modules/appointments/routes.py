@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from app.modules.appointments.service import AppointmentService
+from flask import jsonify
 
 # Single definition for the namespace
 appointment_ns = Namespace("appointments", description="Appointment Management APIs")
@@ -68,3 +69,9 @@ class AppointmentHistory(Resource):
         """Fetch appointment history and analytics for a provider"""
         params = request.args # Extracts ?start_date=... from URL
         return AppointmentService.get_history(provider_id, params)
+
+@appointment_ns.route("/<string:appointment_id>/patient-view")
+class PatientAppointmentView(Resource):
+    def get(self, appointment_id):
+        result, status_code = AppointmentService.get_patient_view(appointment_id)
+        return result, status_code
