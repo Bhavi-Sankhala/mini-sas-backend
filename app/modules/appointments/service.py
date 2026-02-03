@@ -102,3 +102,28 @@ class AppointmentService:
             "error": None
         }, 200
 
+    @staticmethod
+    def update_patient_details(appointment_id, data):
+        result = AppointmentRepository.update_patient_details(
+            appointment_id, data
+        )
+
+        if result == "APPOINTMENT_NOT_FOUND":
+            return {
+                "success": False,
+                "data": None,
+                "error": "Appointment not found"
+            }, 404
+
+        if result == "NO_FIELDS":
+            return {
+                "success": False,
+                "data": None,
+                "error": "No valid fields provided for update"
+            }, 400
+
+        return {
+            "success": True,
+            "data": {"appointment_id": appointment_id},
+            "error": None
+        }, 200

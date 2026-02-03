@@ -75,3 +75,20 @@ class PatientAppointmentView(Resource):
     def get(self, appointment_id):
         result, status_code = AppointmentService.get_patient_view(appointment_id)
         return result, status_code
+
+update_patient_model = appointment_ns.model(
+    "UpdatePatientDetails",
+    {
+        "phone_number": fields.String(example="8888888888"),
+        "email": fields.String(example="updated@example.com"),
+        "fullName": fields.String(example="Patient Updated")
+    }
+)
+
+@appointment_ns.route("/<string:appointment_id>/patient-details")
+class PatientUpdateDetails(Resource):
+
+    @appointment_ns.expect(update_patient_model)
+    def patch(self, appointment_id):
+        data = request.get_json() or {}
+        return AppointmentService.update_patient_details(appointment_id, data)
