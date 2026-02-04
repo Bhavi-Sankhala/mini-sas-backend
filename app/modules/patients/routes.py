@@ -2,6 +2,8 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from app.extensions.db import SessionLocal
 from sqlalchemy import text
+from app.modules.appointments.service import AppointmentService
+ 
 
 patient_ns = Namespace("patients", description="Patient Management")
 
@@ -44,3 +46,26 @@ class GetPatient(Resource):
         Get patient details by patient_id
         """
         return PatientService.get_patient_by_id(patient_id)
+
+@patient_ns.route("/appointment/<string:appointment_id>/view")
+class PatientAppointmentView(Resource):
+    def get(self, appointment_id):
+        result, status_code = AppointmentService.get_patient_view(appointment_id)
+        return result, status_code
+
+update_patient_model = patient_ns.model(
+    "UpdatePatientDetails",
+    {
+        "phone_number": fields.String(example="8888888888"),
+        "email": fields.String(example="updated@example.com"),
+        "fullName": fields.String(example="Patient Updated")
+    }
+)
+
+@patient_ns.route("/appointment/<string:appointment_id>/update")
+class PatientUpdateDetails(Resource):
+
+    @patient_ns.expect(update_patient_model)
+    def patch(self, appointment_id):
+        data = request.get_json() or {}
+        return AppointmentService.update_patient_details(appointment_id, data)

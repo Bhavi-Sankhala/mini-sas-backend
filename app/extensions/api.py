@@ -7,6 +7,8 @@ from app.modules.appointmentfdesk.routes import appointment_ns as frontdesk_appo
 from app.modules.patients.routes import patient_ns
 from app.auth.routes import auth_ns
 from flask_restx import Api
+from app.modules.notifications.routes import notification_ns
+
 
 # Define the authorization scheme
 authorizations = {
@@ -33,3 +35,4 @@ api.add_namespace(appointment_ns, path="/appointments")
 api.add_namespace(frontdesk_appointment_ns, path="/appointments/frontdesk")
 api.add_namespace(billing_ns, path="/billing")
 api.add_namespace(patient_ns, path="/patients")
+api.add_namespace(notification_ns, path="/notifications")
