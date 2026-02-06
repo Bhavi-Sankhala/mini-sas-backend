@@ -69,3 +69,12 @@ class PatientUpdateDetails(Resource):
     def patch(self, appointment_id):
         data = request.get_json() or {}
         return AppointmentService.update_patient_details(appointment_id, data)
+
+@patient_ns.route("/<string:patient_id>/billing")
+class PatientBilling(Resource):
+
+    def get(self, patient_id):
+        """
+        Get all billing invoices for a patient
+        """
+        return PatientService.get_patient_billing(patient_id)

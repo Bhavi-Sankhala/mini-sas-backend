@@ -7,6 +7,8 @@ from app.extensions.api import api
 from app.extensions.db import init_db
 from app.extensions.logging import init_logging
 from app.config.development import DevelopmentConfig
+from app.modules.appointments.routes import appointment_ns
+from app.modules.patients.routes import patient_ns
 
 # Initialize a logger for this file
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ def create_app():
         """
         Safety net that catches any crash in any module.
         """
-        # This captures the line number and file where the crash happened
+        # This captures the line  number and file where the crash happened
         logger.error(f"Unexpected Error: {str(e)}", exc_info=True)
         
         return jsonify({
