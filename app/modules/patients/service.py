@@ -70,3 +70,13 @@ class PatientService:
             "data": {"appointment_id": appointment_id},
             "error": None
         }, 200
+    
+    @staticmethod
+    def get_patient_billing(patient_id):
+        bills = PatientRepository.get_billing_by_patient(patient_id)
+
+        return {
+            "success": True,
+            "data": bills,
+            "error": None
+        }, 200

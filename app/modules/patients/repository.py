@@ -124,3 +124,38 @@ class PatientRepository:
         finally:
             session.close()
 
+    @staticmethod
+    def get_billing_by_patient(patient_id):
+        session = SessionLocal()
+        try:
+            query = text("""
+                SELECT
+                    invoice_id,
+                    amount,
+                    status,
+                    paid_date
+                FROM billing
+                WHERE patient_id = :patient_id
+                ORDER BY created_at DESC
+            """)
+
+            result = session.execute(
+                query,
+                {"patient_id": patient_id}
+            ).mappings().all()
+
+            return [
+                {
+                    "invoice_id": row["invoice_id"],
+                    "amount": float(row["amount"]),
+                    "status": row["status"],
+                    "paid_date": (
+                        row["paid_date"].isoformat()
+                        if row["paid_date"] else None
+                    )
+                }
+                for row in result
+            ]
+
+        finally:
+            session.close()
