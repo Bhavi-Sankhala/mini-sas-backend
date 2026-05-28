@@ -280,3 +280,90 @@ class AppointmentRepository:
             return {"appointments": appointments, "stats": stats}
         finally:
             session.close()
+
+
+    @staticmethod
+    def get_for_patient_view(appointment_id):
+        session = SessionLocal()
+        try:
+            query = text("""
+                SELECT
+                    a.appointment_id,
+                    a.slot_time::TEXT AS slot_time,
+                    a.status,
+                    a.provider_id,
+                    p.patient_id,
+                    p.full_name,
+                    p.phone_number,
+                    p.email
+                FROM appointments a
+                JOIN patients p ON a.patient_id = p.patient_id
+                WHERE a.appointment_id = :appointment_id
+            """)
+
+            result = session.execute(
+                query,
+                {"appointment_id": appointment_id}
+            ).mappings().fetchone()
+
+            if not result:
+                return None
+
+            return dict(result)
+
+        finally:
+            session.close()
+
+    @staticmethod
+    def update_patient_details(appointment_id, data):
+        session = SessionLocal()
+        try:
+            appt = session.execute(
+                text("""
+                    SELECT patient_id
+                    FROM appointments
+                    WHERE appointment_id = :appointment_id
+                """),
+                {"appointment_id": appointment_id}
+            ).fetchone()
+
+            if not appt:
+                return "APPOINTMENT_NOT_FOUND"
+
+            patient_id = appt.patient_id
+
+            fields = []
+            params = {"patient_id": patient_id}
+
+            if "phone_number" in data:
+                fields.append("phone_number = :phone_number")
+                params["phone_number"] = data["phone_number"]
+
+            if "email" in data:
+                fields.append("email = :email")
+                params["email"] = data["email"]
+
+            if "fullName" in data:
+                fields.append("full_name = :full_name")
+                params["full_name"] = data["fullName"]
+
+            if not fields:
+                return "NO_FIELDS"
+
+            update_query = text(f"""
+                UPDATE patients
+                SET {", ".join(fields)}
+                WHERE patient_id = :patient_id
+            """)
+
+            session.execute(update_query, params)
+            session.commit()
+
+            return "UPDATED"
+
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.close()
+
